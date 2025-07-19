@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "137102747395",
+    "project_id": "ccs-compass-8b019",
+    "storage_bucket": "ccs-compass-8b019.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:137102747395:android:ee635e78e0777d7ed9ab36",
+        "android_client_info": {
+          "package_name": "com.example.ccs_compass"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_OntfgFMpmSsHA7SUS4kiVCxomzvbAz8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
