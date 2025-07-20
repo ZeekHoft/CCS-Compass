@@ -26,16 +26,16 @@ class _RegisterPageState extends State<RegisterPage> {
 
   void registerStudent() async {
     // Show loading dialog
-    showDialog(
-      context: context,
-      barrierDismissible:
-          false, // Prevents dismissing the dialog by tapping outside
-      builder: (context) {
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      },
-    );
+    // showDialog(
+    //   context: context,
+    //   barrierDismissible:
+    //       false, // Prevents dismissing the dialog by tapping outside
+    //   builder: (context) {
+    //     return const Center(
+    //       child: CircularProgressIndicator(),
+    //     );
+    //   },
+    // );
     if (_formKey.currentState!.validate()) {
       try {
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -47,6 +47,12 @@ class _RegisterPageState extends State<RegisterPage> {
             idNumberController.text.trim(),
             courseController.text.trim(),
             studentNameController.text.trim());
+        if (mounted) {
+          // Check if the widget is still in the tree
+          Navigator.of(context).pop(); // Pop the loading dialog
+        }
+        checkStudentExist(
+            emailController.text.trim(), idNumberController.text.trim());
       } catch (e) {
         // Catch dynamic to handle web-specific issues
         String message = "An unexpected error occurred.";
@@ -62,12 +68,12 @@ class _RegisterPageState extends State<RegisterPage> {
           } else {
             message = "Firebase Auth Error: ${e.message}";
           }
-          print("Firebase Auth Error: ${e.code} - ${e.message}");
+          errorMessage("Firebase Auth Error: ${e.code} - ${e.message}");
         } else {
           // Fallback for any other unexpected errors, including those on web
           // that might not directly cast to FirebaseAuthException initially.
           message = "An unexpected error occurred: ${e.toString()}";
-          print("General Error: $e");
+          errorMessage("General Error: $e");
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -77,17 +83,34 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
+  Future<bool> checkStudentExist(email, idnumber) async {
+    return await FirebaseFirestore.instance
+        .collection('ccs_students')
+        .where('email', isEqualTo: email)
+        .where('idnumber', isEqualTo: idnumber)
+        .get()
+        .then((value) => value.size > 0 ? true : false);
+  }
+
   Future addStudentDetail(
       String email, String idnumber, String course, String name) async {
+    bool result =
+        await checkStudentExist(email.toString(), idnumber.toString());
+
     try {
-      await FirebaseFirestore.instance.collection("ccs_students").add({
-        "email": email,
-        "idnumber": idnumber,
-        "course": course,
-        "name": name
-      });
+      if (result == true) {
+        errorMessage("User already exists in our database");
+        Navigator.pop(context);
+      } else {
+        await FirebaseFirestore.instance.collection("ccs_students").add({
+          "email": email,
+          "idnumber": idnumber,
+          "course": course,
+          "name": name
+        });
+      }
     } catch (e) {
-      print("error adding student in firestore $e");
+      errorMessage("error adding student in firestore $e");
     }
 
     Navigator.pushReplacement(
