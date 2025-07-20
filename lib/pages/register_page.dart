@@ -1,8 +1,9 @@
-import 'package:ccs_compass/pages/home.dart';
-import 'package:ccs_compass/util/check_email_format.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import "package:ccs_compass/pages/home.dart";
+import "package:ccs_compass/util/check_email_format.dart";
+import "package:cloud_firestore/cloud_firestore.dart";
+import "package:firebase_auth/firebase_auth.dart";
+import "package:flutter/material.dart";
+import "package:flutter/services.dart";
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -16,40 +17,56 @@ class _RegisterPageState extends State<RegisterPage> {
   final passwordController = TextEditingController();
   final idNumberController = TextEditingController();
   final courseController = TextEditingController();
+  final studentNameController = TextEditingController();
+
   final _formKey = GlobalKey<FormState>();
 
   bool validEmail = false;
   bool validId = false;
 
   void registerStudent() async {
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible:
+          false, // Prevents dismissing the dialog by tapping outside
+      builder: (context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
     if (_formKey.currentState!.validate()) {
       try {
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: emailController.text.trim(),
           password: passwordController.text.trim(),
         );
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => Home()));
+        addStudentDetail(
+            emailController.text.trim(),
+            idNumberController.text.trim(),
+            courseController.text.trim(),
+            studentNameController.text.trim());
       } catch (e) {
         // Catch dynamic to handle web-specific issues
-        String message = 'An unexpected error occurred.';
+        String message = "An unexpected error occurred.";
         if (e is FirebaseAuthException) {
-          // This block will be executed if 'e' is indeed a FirebaseAuthException
+          // This block will be executed if "e" is indeed a FirebaseAuthException
           // This is the robust way to handle it for all platforms, including web
-          if (e.code == 'weak-password') {
-            message = 'The password provided is too weak.';
-          } else if (e.code == 'email-already-in-use') {
-            message = 'The account already exists for that email.';
-          } else if (e.code == 'invalid-email') {
-            message = 'The email address is not valid.';
+          if (e.code == "weak-password") {
+            message = "The password provided is too weak.";
+          } else if (e.code == "email-already-in-use") {
+            message = "The account already exists for that email.";
+          } else if (e.code == "invalid-email") {
+            message = "The email address is not valid.";
           } else {
-            message = 'Firebase Auth Error: ${e.message}';
+            message = "Firebase Auth Error: ${e.message}";
           }
           print("Firebase Auth Error: ${e.code} - ${e.message}");
         } else {
           // Fallback for any other unexpected errors, including those on web
           // that might not directly cast to FirebaseAuthException initially.
-          message = 'An unexpected error occurred: ${e.toString()}';
+          message = "An unexpected error occurred: ${e.toString()}";
           print("General Error: $e");
         }
 
@@ -58,6 +75,43 @@ class _RegisterPageState extends State<RegisterPage> {
         );
       }
     }
+  }
+
+  Future addStudentDetail(
+      String email, String idnumber, String course, String name) async {
+    try {
+      await FirebaseFirestore.instance.collection("ccs_students").add({
+        "email": email,
+        "idnumber": idnumber,
+        "course": course,
+        "name": name
+      });
+    } catch (e) {
+      print("error adding student in firestore $e");
+    }
+
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => const Home()));
+  }
+
+  void errorMessage(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Center(
+            child: Text(message),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("Ok"))
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -128,7 +182,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 //password
                 TextFormField(
-                  inputFormatters: [LengthLimitingTextInputFormatter(10)],
                   controller: passwordController,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
@@ -142,6 +195,48 @@ class _RegisterPageState extends State<RegisterPage> {
                     if (value.length < 10) {
                       return "Password too short must be atleast 10 characters";
                     }
+                    return null;
+                  },
+                ),
+                const SizedBox(
+                  height: 5.0,
+                ),
+
+                //course
+                TextFormField(
+                  controller: courseController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    label: Text("Enter Course"),
+                    hintText: "Enter Course BSCS, DMIA, BSIT, BLISS ",
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please enter course";
+                    }
+                    if (value.length < 3) {
+                      return "Invalid course";
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(
+                  height: 5.0,
+                ),
+
+                //Name
+                TextFormField(
+                  controller: studentNameController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    label: Text("Enter Name"),
+                    hintText: "Enter Full Name",
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please enter name";
+                    }
+
                     return null;
                   },
                 ),
