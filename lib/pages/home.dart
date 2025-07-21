@@ -1,5 +1,7 @@
+import 'package:ccs_compass/util/pull_student_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -15,19 +17,37 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final pullStudentData = context.watch<PullStudentData>();
+    if (pullStudentData.isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    // final email = pullStudentData.email;
+    final idnumber = pullStudentData.idnumber;
+    final course = pullStudentData.course;
+    final name = pullStudentData.name;
+
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
           leading: BackButton(onPressed: (signOut)),
           automaticallyImplyLeading: false,
-          iconTheme: IconThemeData(
+          iconTheme: const IconThemeData(
             color: Colors.black, //change your color here
           ),
-          title: Text("Sample"),
+          title: const Text("Sample"),
           centerTitle: true,
         ),
         body: Center(
-          child: Text("HOME"),
+          child: Column(
+            children: [
+              Text(name),
+              Text(idnumber),
+              Text(course),
+            ],
+          ),
         ),
       ),
     );
