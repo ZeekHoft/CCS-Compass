@@ -1,4 +1,5 @@
 import "package:ccs_compass/pages/home.dart";
+import "package:ccs_compass/pages/login_page.dart";
 import "package:ccs_compass/util/check_email_format.dart";
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:firebase_auth/firebase_auth.dart";
@@ -23,6 +24,11 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool validEmail = false;
   bool validId = false;
+
+  void navigateToLogin() {
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => const LoginPage()));
+  }
 
   void registerStudent() async {
     if (_formKey.currentState!.validate()) {
@@ -236,15 +242,31 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: SizedBox(
-                      height: 40.0,
-                      child: ElevatedButton(
-                          onPressed: () {
-                            registerStudent();
-                          },
-                          child: Text("Register Student")),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        ElevatedButton(
+                            onPressed: () {
+                              registerStudent();
+                            },
+                            child: const Text("Register Student")),
+                      ],
                     ),
-                  )
+                  ),
+                  const SizedBox(
+                    height: 40,
+                    child: Center(
+                      child: Text('Some content placed here'),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                          onPressed: (navigateToLogin),
+                          child: const Text("Login Here"))
+                    ],
+                  ),
                 ],
               ),
             ),
