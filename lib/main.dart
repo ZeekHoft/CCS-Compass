@@ -1,5 +1,6 @@
-import 'package:ccs_compass/pages/login_page.dart';
-import 'package:ccs_compass/pages/register_page.dart';
+import 'package:ccs_compass/authenticate/final_authenticate.dart';
+import 'package:ccs_compass/authenticate/login_page.dart';
+import 'package:ccs_compass/authenticate/register_page.dart';
 import 'package:ccs_compass/test.dart';
 import 'package:ccs_compass/util/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -17,6 +18,6 @@ Future main() async {
 
   runApp(const MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: LoginPage(),
+    home: FinalAuthenticate(),
   ));
 }

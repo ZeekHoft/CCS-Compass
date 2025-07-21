@@ -1,5 +1,5 @@
 import "package:ccs_compass/pages/home.dart";
-import "package:ccs_compass/pages/login_page.dart";
+import "package:ccs_compass/authenticate/login_page.dart";
 import "package:ccs_compass/util/check_email_format.dart";
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:firebase_auth/firebase_auth.dart";
@@ -7,7 +7,8 @@ import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+  final Function? onTap;
+  const RegisterPage({super.key, this.onTap});
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
