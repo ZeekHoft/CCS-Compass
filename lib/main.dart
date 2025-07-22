@@ -1,4 +1,4 @@
-import 'package:ccs_compass/authenticate/final_authenticate.dart';
+import 'package:ccs_compass/pages/announcement/create_announcement.dart';
 import 'package:ccs_compass/util/firebase_options.dart';
 import 'package:ccs_compass/util/pull_student_data.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -22,7 +22,8 @@ Future main() async {
     ],
     child: const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: FinalAuthenticate(),
+      // home: FinalAuthenticate(),
+      home: CreateEvent(),
     ),
   ));
 }

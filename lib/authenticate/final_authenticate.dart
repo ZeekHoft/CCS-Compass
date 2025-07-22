@@ -1,6 +1,5 @@
 import 'package:ccs_compass/authenticate/check_log_or_reg.dart';
-import 'package:ccs_compass/pages/home.dart';
-import 'package:ccs_compass/pages/home_layout.dart';
+import 'package:ccs_compass/pages/home/home_layout.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 

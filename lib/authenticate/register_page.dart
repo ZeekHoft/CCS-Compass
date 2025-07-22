@@ -1,4 +1,4 @@
-import "package:ccs_compass/pages/home.dart";
+import "package:ccs_compass/pages/home/home.dart";
 import "package:ccs_compass/authenticate/login_page.dart";
 import "package:ccs_compass/util/check_email_format.dart";
 import "package:cloud_firestore/cloud_firestore.dart";
@@ -33,46 +33,59 @@ class _RegisterPageState extends State<RegisterPage> {
 
   void registerStudent() async {
     if (_formKey.currentState!.validate()) {
-      try {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: emailController.text.trim(),
-          password: passwordController.text.trim(),
+      return;
+    }
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return const Center(
+          child: CircularProgressIndicator(),
         );
-        addStudentDetail(
-            emailController.text.trim(),
-            idNumberController.text.trim(),
-            courseController.text.trim(),
-            studentNameController.text.trim());
-        if (mounted) {
-          Navigator.of(context).pop(); // Pop the loading dialog
-        }
-      } catch (e) {
-        // Catch dynamic to handle web-specific issues
-        String message = "An unexpected error occurred.";
-        if (e is FirebaseAuthException) {
-          // This block will be executed if "e" is indeed a FirebaseAuthException
-          // This is the robust way to handle it for all platforms, including web
-          if (e.code == "weak-password") {
-            message = "The password provided is too weak.";
-          } else if (e.code == "email-already-in-use") {
-            message = "The account already exists for that email.";
-          } else if (e.code == "invalid-email") {
-            message = "The email address is not valid.";
-          } else {
-            message = "Firebase Auth Error: ${e.message}";
-          }
-          errorMessage("Firebase Auth Error: ${e.code} - ${e.message}");
-        } else {
-          // Fallback for any other unexpected errors, including those on web
-          // that might not directly cast to FirebaseAuthException initially.
-          message = "An unexpected error occurred: ${e.toString()}";
-          errorMessage("General Error: $e");
-        }
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
-        );
+      },
+    );
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+      if (mounted) {
+        Navigator.of(context).pop(); // Pop the loading dialog
       }
+      addStudentDetail(
+          emailController.text.trim(),
+          idNumberController.text.trim(),
+          courseController.text.trim(),
+          studentNameController.text.trim());
+      if (mounted) {
+        Navigator.of(context).pop(); // Pop the loading dialog
+      }
+    } catch (e) {
+      // Catch dynamic to handle web-specific issues
+      String message = "An unexpected error occurred.";
+      if (e is FirebaseAuthException) {
+        // This block will be executed if "e" is indeed a FirebaseAuthException
+        // This is the robust way to handle it for all platforms, including web
+        if (e.code == "weak-password") {
+          message = "The password provided is too weak.";
+        } else if (e.code == "email-already-in-use") {
+          message = "The account already exists for that email.";
+        } else if (e.code == "invalid-email") {
+          message = "The email address is not valid.";
+        } else {
+          message = "Firebase Auth Error: ${e.message}";
+        }
+        errorMessage("Firebase Auth Error: ${e.code} - ${e.message}");
+      } else {
+        // Fallback for any other unexpected errors, including those on web
+        // that might not directly cast to FirebaseAuthException initially.
+        message = "An unexpected error occurred: ${e.toString()}";
+        errorMessage("General Error: $e");
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
     }
   }
 
@@ -85,6 +98,9 @@ class _RegisterPageState extends State<RegisterPage> {
         "course": course,
         "name": name
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Account made successfully!')),
+      );
     } catch (e) {
       errorMessage("error adding student in firestore $e");
     }

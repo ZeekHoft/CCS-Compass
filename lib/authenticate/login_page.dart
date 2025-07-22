@@ -1,4 +1,4 @@
-import 'package:ccs_compass/pages/home.dart';
+import 'package:ccs_compass/pages/home/home.dart';
 import 'package:ccs_compass/authenticate/register_page.dart';
 import 'package:ccs_compass/util/check_email_format.dart';
 import 'package:firebase_auth/firebase_auth.dart';

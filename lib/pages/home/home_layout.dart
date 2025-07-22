@@ -1,4 +1,4 @@
-import 'package:ccs_compass/pages/home.dart';
+import 'package:ccs_compass/pages/home/home.dart';
 import 'package:flutter/material.dart';
 
 class HomeLayout extends StatefulWidget {
