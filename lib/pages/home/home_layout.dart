@@ -1,4 +1,5 @@
 import 'package:ccs_compass/pages/home/home.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class HomeLayout extends StatefulWidget {
@@ -10,11 +11,27 @@ class HomeLayout extends StatefulWidget {
 
 class _HomeLayoutState extends State<HomeLayout> {
   int _selectedIndex = 0;
+  void signOut() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+    } catch (e) {
+      print("Error signing out: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Navbar Example')),
+      appBar: AppBar(
+        title: const Text("Welcome Home!"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: signOut,
+            tooltip: 'Sign Out',
+          ),
+        ],
+      ),
       bottomNavigationBar: NavigationBar(
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
         selectedIndex: _selectedIndex,

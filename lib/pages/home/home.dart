@@ -11,10 +11,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  void signOut() {
-    FirebaseAuth.instance.signOut();
-  }
-
   @override
   Widget build(BuildContext context) {
     final pullStudentData = context.watch<PullStudentData>();
@@ -31,15 +27,6 @@ class _HomeState extends State<Home> {
 
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          leading: BackButton(onPressed: (signOut)),
-          automaticallyImplyLeading: false,
-          iconTheme: const IconThemeData(
-            color: Colors.black, //change your color here
-          ),
-          title: const Text("Sample"),
-          centerTitle: true,
-        ),
         body: Center(
           child: Column(
             children: [

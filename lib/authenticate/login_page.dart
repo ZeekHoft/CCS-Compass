@@ -19,11 +19,6 @@ class _LoginPageState extends State<LoginPage> {
 
   bool validEmail = false;
 
-  void navigateToHome() {
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => const Home()));
-  }
-
   void navigateToRegisteration() {
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => const RegisterPage()));
@@ -50,7 +45,6 @@ class _LoginPageState extends State<LoginPage> {
           password: passwordController.text.trim());
       if (mounted) {
         Navigator.of(context).pop(); // Pop the loading dialog
-        navigateToHome();
       }
     } on FirebaseAuthException catch (e) {
       String message;
@@ -72,7 +66,6 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       if (mounted) {
         Navigator.of(context).pop(); // Pop the loading dialog
-        navigateToHome();
       }
       errorMessage("Unexpected Error Occurred: ${e.toString()}");
     }

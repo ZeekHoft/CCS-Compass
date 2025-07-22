@@ -1,4 +1,3 @@
-import "package:ccs_compass/pages/home/home.dart";
 import "package:ccs_compass/authenticate/login_page.dart";
 import "package:ccs_compass/util/check_email_format.dart";
 import "package:cloud_firestore/cloud_firestore.dart";
@@ -32,7 +31,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void registerStudent() async {
-    if (_formKey.currentState!.validate()) {
+    if (!_formKey.currentState!.validate()) {
       return;
     }
     showDialog(
@@ -52,7 +51,7 @@ class _RegisterPageState extends State<RegisterPage> {
       if (mounted) {
         Navigator.of(context).pop(); // Pop the loading dialog
       }
-      addStudentDetail(
+      await addStudentDetail(
           emailController.text.trim(),
           idNumberController.text.trim(),
           courseController.text.trim(),
@@ -64,8 +63,6 @@ class _RegisterPageState extends State<RegisterPage> {
       // Catch dynamic to handle web-specific issues
       String message = "An unexpected error occurred.";
       if (e is FirebaseAuthException) {
-        // This block will be executed if "e" is indeed a FirebaseAuthException
-        // This is the robust way to handle it for all platforms, including web
         if (e.code == "weak-password") {
           message = "The password provided is too weak.";
         } else if (e.code == "email-already-in-use") {
@@ -76,16 +73,23 @@ class _RegisterPageState extends State<RegisterPage> {
           message = "Firebase Auth Error: ${e.message}";
         }
         errorMessage("Firebase Auth Error: ${e.code} - ${e.message}");
+        if (mounted) {
+          Navigator.of(context).pop(); // Pop the loading dialog
+        }
       } else {
-        // Fallback for any other unexpected errors, including those on web
-        // that might not directly cast to FirebaseAuthException initially.
         message = "An unexpected error occurred: ${e.toString()}";
         errorMessage("General Error: $e");
+        if (mounted) {
+          Navigator.of(context).pop(); // Pop the loading dialog
+        }
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message)),
       );
+      if (mounted) {
+        Navigator.of(context).pop(); // Pop the loading dialog
+      }
     }
   }
 
@@ -104,9 +108,6 @@ class _RegisterPageState extends State<RegisterPage> {
     } catch (e) {
       errorMessage("error adding student in firestore $e");
     }
-
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => const Home()));
   }
 
   void errorMessage(String message) {
