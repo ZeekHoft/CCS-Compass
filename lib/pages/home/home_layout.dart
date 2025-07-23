@@ -1,3 +1,4 @@
+import 'package:ccs_compass/authenticate/final_authenticate.dart';
 import 'package:ccs_compass/pages/announcement/council_announcements.dart';
 import 'package:ccs_compass/pages/home/home.dart';
 import 'package:ccs_compass/util/pull_student_data.dart';
@@ -20,6 +21,10 @@ class _HomeLayoutState extends State<HomeLayout> {
       await FirebaseAuth.instance.signOut();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Successfully signed out!')),
+      );
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const FinalAuthenticate()),
+        (Route<dynamic> route) => false,
       );
     } catch (e) {
       print("Error signing out: $e");
