@@ -1,3 +1,4 @@
+import 'package:ccs_compass/pages/announcement/council_announcements.dart';
 import 'package:ccs_compass/pages/home/home.dart';
 import 'package:ccs_compass/util/pull_student_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -55,7 +56,7 @@ class _HomeLayoutState extends State<HomeLayout> {
       body: const [
         Home(),
         Home(),
-        Home(),
+        CouncilAnnouncements(),
       ][_selectedIndex],
     );
   }

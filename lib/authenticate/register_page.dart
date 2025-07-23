@@ -48,9 +48,9 @@ class _RegisterPageState extends State<RegisterPage> {
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
-      if (mounted) {
-        Navigator.of(context).pop(); // Pop the loading dialog
-      }
+      // if (mounted) {
+      //   Navigator.of(context).pop(); // Pop the loading dialog
+      // }
       await addStudentDetail(
           emailController.text.trim(),
           idNumberController.text.trim(),
@@ -100,7 +100,8 @@ class _RegisterPageState extends State<RegisterPage> {
         "email": email,
         "idnumber": idnumber,
         "course": course,
-        "name": name
+        "name": name,
+        "uid": FirebaseAuth.instance.currentUser?.uid,
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Account made successfully!')),

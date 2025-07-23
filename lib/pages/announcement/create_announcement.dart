@@ -1,16 +1,17 @@
 import 'package:ccs_compass/pages/announcement/council_announcements.dart';
+import 'package:ccs_compass/pages/home/home_layout.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class CreateEvent extends StatefulWidget {
-  const CreateEvent({super.key});
+class CreateAnnouncement extends StatefulWidget {
+  const CreateAnnouncement({super.key});
 
   @override
-  State<CreateEvent> createState() => _CreateEventState();
+  State<CreateAnnouncement> createState() => _CreateAnnouncementState();
 }
 
-class _CreateEventState extends State<CreateEvent> {
+class _CreateAnnouncementState extends State<CreateAnnouncement> {
   final titleEventController = TextEditingController();
   final announcedByController = TextEditingController();
   final dateEventController = TextEditingController();
@@ -79,6 +80,18 @@ class _CreateEventState extends State<CreateEvent> {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
+      appBar: AppBar(
+        actions: [
+          ElevatedButton(
+              onPressed: () {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const HomeLayout()));
+              },
+              child: const Icon(Icons.exit_to_app))
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsetsGeometry.all(20.0),
         child: Form(
