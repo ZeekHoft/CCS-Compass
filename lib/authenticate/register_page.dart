@@ -4,6 +4,7 @@ import "package:cloud_firestore/cloud_firestore.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
+import 'package:ccs_compass/authenticate/final_authenticate.dart'; // Import FinalAuthenticate
 
 class RegisterPage extends StatefulWidget {
   final Function? onTap;
@@ -44,70 +45,81 @@ class _RegisterPageState extends State<RegisterPage> {
       },
     );
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      // Create user with email and password
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
-      // if (mounted) {
-      //   Navigator.of(context).pop(); // Pop the loading dialog
-      // }
+
+      // Add student details to Firestore
       await addStudentDetail(
           emailController.text.trim(),
           idNumberController.text.trim(),
           courseController.text.trim(),
-          studentNameController.text.trim());
+          studentNameController.text.trim(),
+          userCredential.user?.uid // Pass the UID from the newly created user
+          );
+
       if (mounted) {
-        Navigator.of(context).pop(); // Pop the loading dialog
-      }
-    } catch (e) {
-      // Catch dynamic to handle web-specific issues
-      String message = "An unexpected error occurred.";
-      if (e is FirebaseAuthException) {
-        if (e.code == "weak-password") {
-          message = "The password provided is too weak.";
-        } else if (e.code == "email-already-in-use") {
-          message = "The account already exists for that email.";
-        } else if (e.code == "invalid-email") {
-          message = "The email address is not valid.";
-        } else {
-          message = "Firebase Auth Error: ${e.message}";
-        }
-        errorMessage("Firebase Auth Error: ${e.code} - ${e.message}");
-        if (mounted) {
-          Navigator.of(context).pop(); // Pop the loading dialog
-        }
-      } else {
-        message = "An unexpected error occurred: ${e.toString()}";
-        errorMessage("General Error: $e");
-        if (mounted) {
-          Navigator.of(context).pop(); // Pop the loading dialog
-        }
+        Navigator.of(context).pop(); // Pop the loading dialog on success
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
+        const SnackBar(content: Text('Account made successfully!')),
       );
+
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const FinalAuthenticate()),
+        (Route<dynamic> route) => false, // Remove all previous routes
+      );
+    } catch (e) {
       if (mounted) {
-        Navigator.of(context).pop(); // Pop the loading dialog
+        Navigator.of(context).pop();
       }
+
+      String userFriendlyMessage =
+          "An unexpected error occurred. Please try again.";
+      String debugMessage = "General Error: $e";
+
+      if (e is FirebaseAuthException) {
+        debugMessage = "Firebase Auth Error: ${e.code} - ${e.message}";
+        if (e.code == "weak-password") {
+          userFriendlyMessage =
+              "The password provided is too weak. Please choose a stronger one.";
+        } else if (e.code == "email-already-in-use") {
+          userFriendlyMessage =
+              "This email is already registered. Please try logging in or use a different email.";
+        } else if (e.code == "invalid-email") {
+          userFriendlyMessage =
+              "The email address is not valid. Please check the format.";
+        } else {
+          userFriendlyMessage = "Registration failed: ${e.message}";
+        }
+      } else {
+        debugMessage = "General Error: ${e.toString()}";
+      }
+
+      // Show only the AlertDialog for errors, as it requires user acknowledgement
+      errorMessage(userFriendlyMessage);
+      print(
+          debugMessage); // Uncomment to print detailed error to console for debugging
     }
   }
 
-  Future addStudentDetail(
-      String email, String idnumber, String course, String name) async {
+  Future addStudentDetail(String email, String idnumber, String course,
+      String name, String? uid) async {
     try {
       await FirebaseFirestore.instance.collection("ccs_students").add({
         "email": email,
         "idnumber": idnumber,
         "course": course,
         "name": name,
-        "uid": FirebaseAuth.instance.currentUser?.uid,
+        "uid": uid, // Use the UID passed from userCredential
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Account made successfully!')),
-      );
+      // SnackBar is already shown in registerStudent for overall success
     } catch (e) {
-      errorMessage("error adding student in firestore $e");
+      errorMessage("Error adding student in Firestore: $e");
     }
   }
 
@@ -121,10 +133,11 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
           actions: [
             TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text("Ok"))
+              onPressed: () {
+                Navigator.pop(context); // Dismiss the error dialog
+              },
+              child: const Text("Ok"),
+            ),
           ],
         );
       },
@@ -145,6 +158,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 children: [
                   TextFormField(
                       controller: emailController,
+                      obscureText: false, // Ensure email is not obscured
                       decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                           label: Text("Email"),
@@ -164,7 +178,6 @@ class _RegisterPageState extends State<RegisterPage> {
                           validEmail = isValid;
                         });
                       }),
-
                   const SizedBox(
                     height: 5.0,
                   ),
@@ -202,6 +215,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   //password
                   TextFormField(
                     controller: passwordController,
+                    obscureText: false,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       label: Text("Password"),
@@ -212,7 +226,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         return "Please enter password";
                       }
                       if (value.length < 10) {
-                        return "Password too short must be atleast 10 characters";
+                        return "Password too short, must be at least 10 characters";
                       }
                       return null;
                     },
@@ -255,7 +269,6 @@ class _RegisterPageState extends State<RegisterPage> {
                       if (value == null || value.isEmpty) {
                         return "Please enter name";
                       }
-
                       return null;
                     },
                   ),
@@ -299,6 +312,7 @@ class _RegisterPageState extends State<RegisterPage> {
     passwordController.dispose();
     idNumberController.dispose();
     courseController.dispose();
+    studentNameController.dispose();
     super.dispose();
   }
 }

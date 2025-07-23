@@ -3,6 +3,7 @@ import 'package:ccs_compass/pages/announcement/council_announcements.dart';
 import 'package:ccs_compass/pages/home/home.dart';
 import 'package:ccs_compass/util/pull_student_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -27,7 +28,9 @@ class _HomeLayoutState extends State<HomeLayout> {
         (Route<dynamic> route) => false,
       );
     } catch (e) {
-      print("Error signing out: $e");
+      if (kDebugMode) {
+        print("Error signing out: $e");
+      }
     }
   }
 
