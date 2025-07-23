@@ -1,6 +1,8 @@
 import 'package:ccs_compass/pages/home/home.dart';
+import 'package:ccs_compass/util/pull_student_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomeLayout extends StatefulWidget {
   const HomeLayout({super.key});
@@ -13,7 +15,11 @@ class _HomeLayoutState extends State<HomeLayout> {
   int _selectedIndex = 0;
   void signOut() async {
     try {
+      Provider.of<PullStudentData>(context, listen: false).clearStudentData();
       await FirebaseAuth.instance.signOut();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Successfully signed out!')),
+      );
     } catch (e) {
       print("Error signing out: $e");
     }
