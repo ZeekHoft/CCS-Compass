@@ -91,7 +91,7 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
     return PopScope(
       // This handles the system back button or implicit back arrow
       canPop: false, // Prevent the default pop behavior
-      onPopInvoked: (didPop) {
+      onPopInvokedWithResult: (didPop, result) {
         if (didPop) {
           return; // If the system already handled the pop, do nothing
         }
